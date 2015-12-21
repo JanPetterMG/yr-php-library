@@ -10,7 +10,8 @@ class Location
     protected $forecasts_hourly;
 
     /**
-     * Periodic data
+     * Periodic data.
+     *
      * @var Forecast[]
      */
     protected $forecasts_periodic;
@@ -21,13 +22,15 @@ class Location
     protected $textual_forecasts;
 
     /**
-     * List of WheaterStation objects
+     * List of WheaterStation objects.
+     *
      * @var WeatherStation[]
      */
     protected $weather_stations;
 
     /**
-     * The location where we have weather data
+     * The location where we have weather data.
+     *
      * @var array
      */
     protected $location;
@@ -39,24 +42,28 @@ class Location
 
     /**
      * Credit should be used...
-     * @var String
+     *
+     * @var string
      */
     protected $credit_url;
 
     /**
-     * Credit derp
-     * @var String
+     * Credit derp.
+     *
+     * @var string
      */
     protected $credit_text;
 
     /**
-     * Time when the web service was last refreshed
+     * Time when the web service was last refreshed.
+     *
      * @var \DateTime
      */
     protected $last_update_date;
 
     /**
-     * Time when the web service will update next
+     * Time when the web service will update next.
+     *
      * @var \DateTime
      */
     protected $next_update_date;
@@ -72,7 +79,7 @@ class Location
     protected $sunset;
 
     /**
-     * Creates the Yr object with forecasts
+     * Creates the Yr object with forecasts.
      *
      * @param array $location
      * @param array $forecasts_periodic
@@ -80,15 +87,15 @@ class Location
      */
     public function __construct(array $location, array $forecasts_periodic, array $forecasts_hourly)
     {
-        $this->location             = $location;
-        $this->forecasts_periodic   = $forecasts_periodic;
-        $this->forecasts_hourly     = $forecasts_hourly;
-        $this->links                = array();
-        $this->weather_stations     = array();
+        $this->location = $location;
+        $this->forecasts_periodic = $forecasts_periodic;
+        $this->forecasts_hourly = $forecasts_hourly;
+        $this->links = [];
+        $this->weather_stations = [];
     }
 
     /**
-     * @return String
+     * @return string
      */
     public function getName()
     {
@@ -96,7 +103,7 @@ class Location
     }
 
     /**
-     * @return String
+     * @return string
      */
     public function getType()
     {
@@ -104,7 +111,7 @@ class Location
     }
 
     /**
-     * @return String
+     * @return string
      */
     public function getCountry()
     {
@@ -112,7 +119,7 @@ class Location
     }
 
     /**
-     * @return String
+     * @return string
      */
     public function getTimezone()
     {
@@ -124,14 +131,14 @@ class Location
      */
     public function getLatLong()
     {
-        return array(
-            'lat' => $this->location['location']['latitude'],
+        return [
+            'lat'  => $this->location['location']['latitude'],
             'long' => $this->location['location']['longitude'],
-        );
+        ];
     }
 
     /**
-     * List of links to the yr.no frontend
+     * List of links to the yr.no frontend.
      *
      * @return array
      */
@@ -141,10 +148,10 @@ class Location
     }
 
     /**
-     * Adds a link
+     * Adds a link.
      *
-     * @param String $name
-     * @param String $url
+     * @param string $name
+     * @param string $url
      */
     public function addLink($name, $url)
     {
@@ -152,7 +159,7 @@ class Location
     }
 
     /**
-     * Returns the current forecast (using periodic)
+     * Returns the current forecast (using periodic).
      *
      * @return Forecast
      */
@@ -164,12 +171,13 @@ class Location
     }
 
     /**
-     * Returns the upcoming forecasts as array of Forecast objects
+     * Returns the upcoming forecasts as array of Forecast objects.
      *
      * You can optionally specify $from and $to as unixtime.
      *
-     * @param  int   $from unixtime for when the first forecast should start
-     * @param  int   $to   unixtime for when the last forecast should start
+     * @param int $from unixtime for when the first forecast should start
+     * @param int $to   unixtime for when the last forecast should start
+     *
      * @return array Forecast objects
      */
     public function getHourlyForecasts($from = null, $to = null)
@@ -182,12 +190,13 @@ class Location
     }
 
     /**
-     * There is 4 peridos in a day. You can check the Forecast::getPeriod()
+     * There is 4 peridos in a day. You can check the Forecast::getPeriod().
      *
      * You can optionally specify $from and $to as unixtime.
      *
-     * @param  int   $from unixtime for when the first forecast should start
-     * @param  int   $to   unixtime for when the last forecast should start
+     * @param int $from unixtime for when the first forecast should start
+     * @param int $to   unixtime for when the last forecast should start
+     *
      * @return array Forecast objects
      */
     public function getPeriodicForecasts($from = null, $to = null)
@@ -200,9 +209,10 @@ class Location
     }
 
     /**
-     * Get a Forecast at a specific time
+     * Get a Forecast at a specific time.
      *
-     * @param  String     $time unixtime for when the forecast should be
+     * @param string $time unixtime for when the forecast should be
+     *
      * @return Forecast[]
      */
     public function getForecastAt($time)
@@ -213,23 +223,24 @@ class Location
     }
 
     /**
-     * Internal function to find forecasts between a given time
+     * Internal function to find forecasts between a given time.
      *
      * Notice that if $from is null, we change it to now()
      * and if $to is null, we change it to the time one year from now
      *
-     * @param  Forecast[] $forecasts the list of forecasts to check
-     * @param  int        $from      unixtime for when the forecast should start
-     * @param  int        $to        unixtime for when the last forecast should start
-     * @return array      list of matching forecasts
+     * @param Forecast[] $forecasts the list of forecasts to check
+     * @param int        $from      unixtime for when the forecast should start
+     * @param int        $to        unixtime for when the last forecast should start
+     *
+     * @return array list of matching forecasts
      */
     protected function getForecastsBetweenTime($forecasts, $from, $to = null)
     {
-        $result = array();
+        $result = [];
 
         // Check for null, or non valid unixtimes
         $from = is_null($from) || !is_int($from) ? time() : $from;
-        $to = is_null($to) || !is_int($to) ? strtotime("1 year") : $to;
+        $to = is_null($to) || !is_int($to) ? strtotime('1 year') : $to;
 
         foreach ($forecasts as $forecast) {
             if ($forecast->getFrom()->getTimestamp() >= $from &&
@@ -243,7 +254,7 @@ class Location
 
     /**
      * Note: The textual forecasts is always norwegian..
-     * Note: Places outside of Norway might not have textual forecasts
+     * Note: Places outside of Norway might not have textual forecasts.
      *
      * @return TextualForecast[]
      */
@@ -261,7 +272,7 @@ class Location
     }
 
     /**
-     * Note: Places outside of Norway might not have weather stations
+     * Note: Places outside of Norway might not have weather stations.
      *
      * @return WeatherStation[]
      */
@@ -311,7 +322,8 @@ class Location
     }
 
     /**
-     * Returns the time the hourly data was last updated
+     * Returns the time the hourly data was last updated.
+     *
      * @return \DateTime
      */
     public function getLastUpdated()
@@ -320,7 +332,8 @@ class Location
     }
 
     /**
-     * Setter for last update
+     * Setter for last update.
+     *
      * @param \DateTime $date
      */
     public function setLastUpdated(\Datetime $date)
@@ -329,7 +342,8 @@ class Location
     }
 
     /**
-     * Returns the time this will update next time the hourly data will update
+     * Returns the time this will update next time the hourly data will update.
+     *
      * @return \DateTime
      */
     public function getNextUpdate()
@@ -338,7 +352,6 @@ class Location
     }
 
     /**
-     *
      * @param \DateTime
      */
     public function setNextUpdate(\Datetime $date)
@@ -347,7 +360,7 @@ class Location
     }
 
     /**
-     * @return String
+     * @return string
      */
     public function getCreditUrl()
     {
@@ -355,7 +368,7 @@ class Location
     }
 
     /**
-     * @param String $url
+     * @param string $url
      */
     public function setCreditUrl($url)
     {
@@ -363,9 +376,11 @@ class Location
     }
 
     /**
-     * You have to display this text with a link to the creditUrl! Read rules
+     * You have to display this text with a link to the creditUrl! Read rules.
+     *
      * @see getCreditUrl()
-     * @return String
+     *
+     * @return string
      */
     public function getCreditText()
     {
@@ -373,7 +388,7 @@ class Location
     }
 
     /**
-     * @param String $text
+     * @param string $text
      */
     public function setCreditText($text)
     {
@@ -385,17 +400,17 @@ class Location
      */
     public function toArray()
     {
-        return array(
-            'location'    => $this->location,
-            'links'       => $this->links,
-            'last_update' => $this->getLastUpdated(),
-            'next_update' => $this->getNextUpdate(),
-            'credit_text' => $this->getCreditText(),
-            'credit_url'  => $this->getCreditUrl(),
-            'sunrise'     => $this->getSunrise(),
-            'sunset'      => $this->getSunset(),
-            'forecasts'   => $this->getHourlyForecasts(),
+        return [
+            'location'         => $this->location,
+            'links'            => $this->links,
+            'last_update'      => $this->getLastUpdated(),
+            'next_update'      => $this->getNextUpdate(),
+            'credit_text'      => $this->getCreditText(),
+            'credit_url'       => $this->getCreditUrl(),
+            'sunrise'          => $this->getSunrise(),
+            'sunset'           => $this->getSunset(),
+            'forecasts'        => $this->getHourlyForecasts(),
             'weather_stations' => $this->getWeatherStations(),
-        );
+        ];
     }
 }

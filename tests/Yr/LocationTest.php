@@ -4,14 +4,15 @@ class LocationTest extends PHPUnit_Framework_TestCase
 {
     public function setUp()
     {
-        $this->location = Yr\Yr::create("Norway/Oslo/Oslo/Oslo", "/tmp");
+        $this->location = Yr\Yr::create('Norway/Oslo/Oslo/Oslo', '/tmp');
     }
+
     public function testGetHourlyForecasts()
     {
         $forecasts = $this->location->getHourlyForecasts();
         $this->assertTrue(is_array($forecasts) && count($forecasts) > 0);
 
-        $forecasts = $this->location->getHourlyForecasts(strtotime("now"), strtotime("tomorrow"));
+        $forecasts = $this->location->getHourlyForecasts(strtotime('now'), strtotime('tomorrow'));
         $this->assertTrue(is_array($forecasts) && count($forecasts) > 0);
     }
 
@@ -23,7 +24,7 @@ class LocationTest extends PHPUnit_Framework_TestCase
         $forecast = reset($forecasts);
         $this->assertInstanceOf("Yr\Forecast", $forecast);
 
-        $forecasts = $this->location->getPeriodicForecasts(strtotime("now"), strtotime("tomorrow"));
+        $forecasts = $this->location->getPeriodicForecasts(strtotime('now'), strtotime('tomorrow'));
         $this->assertTrue(is_array($forecasts) && count($forecasts) > 0);
 
         $forecast = reset($forecasts);
@@ -32,7 +33,7 @@ class LocationTest extends PHPUnit_Framework_TestCase
 
     public function testGetForecastAt()
     {
-        $this->assertInstanceOf("Yr\Forecast", $this->location->getForecastAt(strtotime("now")));
+        $this->assertInstanceOf("Yr\Forecast", $this->location->getForecastAt(strtotime('now')));
     }
 
     public function testGetWeatherStations()
@@ -74,8 +75,8 @@ class LocationTest extends PHPUnit_Framework_TestCase
 
         $this->assertTrue(is_array($latLong));
 
-        $this->assertArrayHasKey("lat", $latLong);
-        $this->assertArrayHasKey("long", $latLong);
+        $this->assertArrayHasKey('lat', $latLong);
+        $this->assertArrayHasKey('long', $latLong);
     }
 
     public function testGetCredit()

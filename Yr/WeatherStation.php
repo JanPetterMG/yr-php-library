@@ -4,15 +4,14 @@ namespace Yr;
 
 /**
  * Weather Station
- * Note that the Forecast object will not be complete since all data from it might not be set :/
+ * Note that the Forecast object will not be complete since all data from it might not be set :/.
  *
- * @package Yr
  * @author Einar Gangsø <einargangso@gmail.com>
  */
 class WeatherStation
 {
     /**
-     * @var String
+     * @var string
      */
     protected $name;
 
@@ -27,7 +26,7 @@ class WeatherStation
     protected $latLong;
 
     /**
-     * @var String
+     * @var string
      */
     protected $source;
 
@@ -53,19 +52,20 @@ class WeatherStation
     }
 
     /**
-     * @param  \SimpleXMLElement $xml
+     * @param \SimpleXMLElement $xml
+     *
      * @return WeatherStation
      */
     public static function getWeatherStationFromXml(\SimpleXMLElement $xml)
     {
         $data = Yr::xmlToArray($xml);
 
-        $name     = $data['name'];
+        $name = $data['name'];
         $distance = $data['distance'];
-        $latLong  = array('lat' => $data['lat'], 'long' => $data['lon']);
-        $source   = $data['source'];
+        $latLong = ['lat' => $data['lat'], 'long' => $data['lon']];
+        $source = $data['source'];
 
-        $station = new WeatherStation($name, $distance, $latLong, $source);
+        $station = new self($name, $distance, $latLong, $source);
 
         $forecast = $station->getForecast();
 
@@ -89,7 +89,7 @@ class WeatherStation
     }
 
     /**
-     * @return String
+     * @return string
      */
     public function getName()
     {
@@ -105,7 +105,7 @@ class WeatherStation
     }
 
     /**
-     * array('lat' => '[xx.xxxx]', 'long' => '[xx.xxxx]')
+     * array('lat' => '[xx.xxxx]', 'long' => '[xx.xxxx]').
      *
      * @return array
      */
@@ -115,8 +115,7 @@ class WeatherStation
     }
 
     /**
-     *
-     * @return String
+     * @return string
      */
     public function getSource()
     {
@@ -124,7 +123,7 @@ class WeatherStation
     }
 
     /**
-     * Warning: Not everything will be set on this object
+     * Warning: Not everything will be set on this object.
      *
      * @return Forecast the current forecast reported by this weatherstation
      */
@@ -146,12 +145,12 @@ class WeatherStation
      */
     public function toArray()
     {
-        return array(
-            'name' => $this->name,
+        return [
+            'name'     => $this->name,
             'distance' => $this->distance,
-            'latLong' => $this->latLong,
-            'source' => $this->source,
+            'latLong'  => $this->latLong,
+            'source'   => $this->source,
             'forecast' => $this->forecast,
-        );
+        ];
     }
 }

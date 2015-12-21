@@ -4,7 +4,7 @@ class WeatherStationTest extends PHPUnit_Framework_TestCase
 {
     public function setUp()
     {
-        $this->yr = Yr\Yr::create("Norway/Oslo/Oslo/Oslo", "/tmp");
+        $this->yr = Yr\Yr::create('Norway/Oslo/Oslo/Oslo', '/tmp');
         $stations = $this->yr->getWeatherStations();
         $this->station = reset($stations);
     }
@@ -12,13 +12,13 @@ class WeatherStationTest extends PHPUnit_Framework_TestCase
     public function testGetName()
     {
         $name = $this->station->getName();
-        $this->assertTrue(is_string($name) && !empty($name), "getName() is empty or not string");
+        $this->assertTrue(is_string($name) && !empty($name), 'getName() is empty or not string');
     }
 
     public function testGetDistance()
     {
         $distance = $this->station->getDistance();
-        $this->assertTrue(is_numeric($distance) && !empty($distance), "getDistance() is empty or not numeric");
+        $this->assertTrue(is_numeric($distance) && !empty($distance), 'getDistance() is empty or not numeric');
     }
 
     public function testgetLatLong()
@@ -27,15 +27,15 @@ class WeatherStationTest extends PHPUnit_Framework_TestCase
 
         $this->assertTrue(is_array($latLong));
 
-        $this->assertArrayHasKey("lat", $latLong);
-        $this->assertArrayHasKey("long", $latLong);
+        $this->assertArrayHasKey('lat', $latLong);
+        $this->assertArrayHasKey('long', $latLong);
     }
 
     public function testGetSource()
     {
         $source = $this->station->getSource();
 
-        $this->assertTrue(is_string($source) && !empty($source), "getSource() is not string or empty");
+        $this->assertTrue(is_string($source) && !empty($source), 'getSource() is not string or empty');
     }
 
     public function testGetForecast()
