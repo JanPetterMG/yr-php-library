@@ -18,12 +18,12 @@ class Yr
      *
      * @var string
      */
-    const XML_DATE_FORMAT = "Y-m-d?H:i:s";
+    const XML_DATE_FORMAT = 'Y-m-d?H:i:s';
 
     /**
      * Yr url.
      */
-    const API_URL = "http://www.yr.no/";
+    const API_URL = 'http://www.yr.no/';
 
     /**
      * HTTP 200 response with text/xml.
@@ -43,7 +43,7 @@ class Yr
     /**
      * Prefix for the xml files.
      */
-    const CACHE_PREFIX = "phpyrno_";
+    const CACHE_PREFIX = 'phpyrno_';
 
     /**
      * Only static functions here.
@@ -63,16 +63,16 @@ class Yr
      * Which with this library would be:
      *     Yr::create("Norway/Vestfold/Sandefjord/Sandefjord")
      *
-     * @param String $location   the location, like Norway/Vestfold/Sandefjord
-     * @param String $cache_path where to store the cache
+     * @param string $location   the location, like Norway/Vestfold/Sandefjord
+     * @param string $cache_path where to store the cache
      * @param int    $cache_life life of the cache in minutes
-     * @param String $language   language, norwegian or english
-     *
-     * @return Location
+     * @param string $language   language, norwegian or english
      *
      * @throws \RuntimeException         if cache path is not writeable
      * @throws \RuntimeException         if the location is not correct
      * @throws \InvalidArgumentException
+     *
+     * @return Location
      *
      * @todo Check data we are setting on the yr object (meta data, dates, etc)
      */
@@ -80,14 +80,14 @@ class Yr
         $location,
         $cache_path,
         $cache_life = 10,
-        $language = "english"
+        $language = 'english'
     ) {
         if (!isset($location) || empty($location)) {
-            throw new \InvalidArgumentException("Location need to be set");
+            throw new \InvalidArgumentException('Location need to be set');
         }
 
         if (!isset($cache_path) || empty($cache_path)) {
-            throw new \InvalidArgumentException("Cache path need to be set");
+            throw new \InvalidArgumentException('Cache path need to be set');
         }
 
         // Get url, it is different for each language
@@ -106,8 +106,8 @@ class Yr
 
         // Cache paths for the xml data
         $cachename = self::CACHE_PREFIX.md5($baseurl.$location);
-        $xml_periodic_path = $cache_path.$cachename."_periodic.xml";
-        $xml_hourly_path   = $cache_path.$cachename."_hourly.xml";
+        $xml_periodic_path = $cache_path.$cachename.'_periodic.xml';
+        $xml_hourly_path = $cache_path.$cachename.'_hourly.xml';
 
         // Check response from web service
         // This is a critical process if we have no cache.
@@ -122,9 +122,9 @@ class Yr
                 );
             } elseif ($test == self::SERVICE_UNKNOWN_STATE) {
                 throw new \RuntimeException(
-                    "Could not connect to yr service.
+                    'Could not connect to yr service.
                     Tried the url for 7 times, but did not work.
-                    Might be do to invalid location, or yr service is down."
+                    Might be do to invalid location, or yr service is down.'
                 );
             }
         }
@@ -147,7 +147,7 @@ class Yr
         $xml_periodic = new \SimpleXMLElement($xml_periodic_path, null, true);
 
         // Forecasts
-        $forecasts_hourly   = self::getForecastsFromXml($xml_hourly);
+        $forecasts_hourly = self::getForecastsFromXml($xml_hourly);
         $forecasts_periodic = self::getForecastsFromXml($xml_periodic);
 
         // Textual
@@ -158,10 +158,10 @@ class Yr
 
         // Get other data for our object
         $location = self::xmlToArray($xml_periodic->location);
-        $links    = self::xmlToArray($xml_periodic->links);
-        $credit   = self::xmlToArray($xml_periodic->credit->link);
-        $meta     = self::xmlToArray($xml_periodic->meta);
-        $sun      = self::xmlToArray($xml_periodic->sun);
+        $links = self::xmlToArray($xml_periodic->links);
+        $credit = self::xmlToArray($xml_periodic->credit->link);
+        $meta = self::xmlToArray($xml_periodic->meta);
+        $sun = self::xmlToArray($xml_periodic->sun);
 
         // Set the data on the object
         try {
@@ -197,7 +197,7 @@ class Yr
             return $yr;
         } catch (\Exception $e) {
             // We fall back and send exception if something goes wrong
-            throw new \RuntimeException("Could not create Location object");
+            throw new \RuntimeException('Could not create Location object');
         }
     }
 
@@ -210,7 +210,7 @@ class Yr
      */
     public static function xmlToArray($data)
     {
-        $out = array();
+        $out = [];
 
         foreach ((array) $data as $index => $node) {
             if ($index == 'comment') {
@@ -220,7 +220,7 @@ class Yr
             if (is_object($node) || is_array($node)) {
                 $value = self::xmlToArray($node);
             } else {
-                 $value = (string) $node;
+                $value = (string) $node;
             }
 
             if ($index == '@attributes') {
@@ -234,13 +234,13 @@ class Yr
     }
 
     /**
-     * @param  \SimpleXMLElement $xml
+     * @param \SimpleXMLElement $xml
      *
      * @return WeatherStation[]
      */
     public static function getWeatherStationsFromXml(\SimpleXMLElement $xml)
     {
-        $weather_stations = array();
+        $weather_stations = [];
         if (!empty($xml->observations)) {
             foreach ($xml->observations->weatherstation as $observation) {
                 try {
@@ -261,7 +261,7 @@ class Yr
      */
     public static function getTextualForecastsFromXml(\SimpleXMLElement $xml)
     {
-        $textual_forecasts = array();
+        $textual_forecasts = [];
 
         // Some places to not have textual forecasts
         if (!empty($xml->forecast->text)) {
@@ -278,12 +278,13 @@ class Yr
     }
 
     /**
-     * @param  \SimpleXMLElement $xml
+     * @param \SimpleXMLElement $xml
+     *
      * @return Forecast[]
      */
     public static function getForecastsFromXml(\SimpleXMLElement $xml)
     {
-        $forecasts = array();
+        $forecasts = [];
         foreach ($xml->forecast->tabular->time as $forecast) {
             try {
                 $forecasts[] = Forecast::getForecastFromXml($forecast);
@@ -298,9 +299,9 @@ class Yr
     /**
      * Downloads the data from url and store in cache.
      *
-     * @param String  $url
-     * @param String  $path
-     * @param integer $cacheLife
+     * @param string $url
+     * @param string $path
+     * @param int    $cacheLife
      */
     private static function downloadData($url, $path, $cacheLife)
     {
@@ -315,21 +316,21 @@ class Yr
     }
 
     /**
-     * @param String $language lowercase language string
+     * @param string $language lowercase language string
      *
-     * @return String
+     * @return string
      */
     private static function getApiUrlByLanguage($language)
     {
         switch ($language) {
-            case "norwegian":
-            case "newnorwegian":
-            case "neonorwegian":
-            case "nynorsk":
-                return self::API_URL."sted/";
+            case 'norwegian':
+            case 'newnorwegian':
+            case 'neonorwegian':
+            case 'nynorsk':
+                return self::API_URL.'sted/';
 
             default:
-                return self::API_URL."place/";
+                return self::API_URL.'place/';
         }
     }
 
@@ -338,18 +339,18 @@ class Yr
      *
      * @see getUrlResponseCode()
      *
-     * @param String $url the urls
+     * @param string $url the urls
      *
      * @return int the response
      */
     private static function getServiceResponseCode($url)
     {
         // Check first url
-        $url1 = self::getUrlResponseCode($url."/forecast_hour_by_hour.xml");
+        $url1 = self::getUrlResponseCode($url.'/forecast_hour_by_hour.xml');
 
         // If the url is ok, test the other one
         if ($url1 == self::SERVICE_OK) {
-            $url2 = self::getUrlResponseCode($url."/forecast.xml");
+            $url2 = self::getUrlResponseCode($url.'/forecast.xml');
 
             // Since url1 is ok, return code for url2
             return $url2;
@@ -368,7 +369,7 @@ class Yr
      *
      * Thanks to https://github.com/prebenlm for finding the bug
      *
-     * @param String $url full url to the endpoint
+     * @param string $url full url to the endpoint
      *
      * @return int Status code
      */
@@ -383,7 +384,7 @@ class Yr
             curl_close($resource);
 
             if ($retcode === 0) {
-                throw new \RuntimeException("Check your internet connection");
+                throw new \RuntimeException('Check your internet connection');
             }
 
             // This might happend for 5-10 times
@@ -394,13 +395,13 @@ class Yr
 
             // Response is OK, but we are not returning XML
             // Most likely malformatted url, like: Norway/Akershus/Nes
-            if (($retcode == 200 && $type != "text/xml; charset=utf-8")
+            if (($retcode == 200 && $type != 'text/xml; charset=utf-8')
                 || $retcode == 404) {
                 return self::SERVICE_LOCATION_INVALID;
             }
 
             // Response is OK, and the format is xml. Lets go with that
-            if ($retcode == 200 && $type == "text/xml; charset=utf-8") {
+            if ($retcode == 200 && $type == 'text/xml; charset=utf-8') {
                 return self::SERVICE_OK;
             }
         }

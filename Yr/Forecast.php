@@ -42,7 +42,7 @@ class Forecast
     /**
      * Precipitation in millimeters.
      *
-     * @var String
+     * @var string
      */
     public $precipitation;
 
@@ -86,23 +86,23 @@ class Forecast
      *
      * @param \SimpleXMLElement $xml The xml node element
      *
-     * @return Forecast
-     *
      * @throws \RuntimeException If some data is missing for xml
+     *
+     * @return Forecast
      */
     public static function getForecastFromXml(\SimpleXMLElement $xml)
     {
-        $forecast = new Forecast();
+        $forecast = new self();
 
         $data = Yr::xmlToArray($xml);
 
         if (!isset($data['from'], $data['to'])) {
-            throw new \RuntimeException("Missing from/to for forecast");
+            throw new \RuntimeException('Missing from/to for forecast');
         }
 
         $forecast->from = \DateTime::createFromFormat(Yr::XML_DATE_FORMAT, $data['from']);
         $forecast->to = \DateTime::createFromFormat(Yr::XML_DATE_FORMAT, $data['to']);
-        $forecast->period = isset($data['period']) ? $data['period'] : "";
+        $forecast->period = isset($data['period']) ? $data['period'] : '';
 
         if (!isset($data['symbol'],
                   $data['precipitation'],
@@ -110,15 +110,15 @@ class Forecast
                   $data['windSpeed'],
                   $data['temperature'],
                   $data['pressure'])) {
-            throw new \RuntimeException("Missing data for forecast");
+            throw new \RuntimeException('Missing data for forecast');
         }
 
-        $forecast->symbol         = $data['symbol'];
-        $forecast->precipitation  = $data['precipitation'];
+        $forecast->symbol = $data['symbol'];
+        $forecast->precipitation = $data['precipitation'];
         $forecast->wind_direction = $data['windDirection'];
-        $forecast->wind_speed     = $data['windSpeed'];
-        $forecast->temperature    = $data['temperature'];
-        $forecast->pressure       = $data['pressure'];
+        $forecast->wind_speed = $data['windSpeed'];
+        $forecast->temperature = $data['temperature'];
+        $forecast->pressure = $data['pressure'];
 
         return $forecast;
     }
@@ -132,11 +132,11 @@ class Forecast
      *
      * Default value will give "name"
      *
-     * @param String $key number|name|var
+     * @param string $key number|name|var
      *
      * @return string|array default is name
      */
-    public function getSymbol($key = "name")
+    public function getSymbol($key = 'name')
     {
         return isset($this->symbol[$key]) ? $this->symbol[$key] : null;
     }
@@ -157,17 +157,17 @@ class Forecast
      *
      * Default value will give "value"
      *
-     * @param String $key value|minvalue|maxvalue
+     * @param string $key value|minvalue|maxvalue
      *
      * @return string
      */
-    public function getPrecipitation($key = "value")
+    public function getPrecipitation($key = 'value')
     {
         return isset($this->precipitation[$key]) ? $this->precipitation[$key] : null;
     }
 
     /**
-     * @param String $precipitation
+     * @param string $precipitation
      */
     public function setPrecipitation($precipitation)
     {
@@ -182,11 +182,11 @@ class Forecast
      *
      * Default value will send the code
      *
-     * @param String $key deg|code|name
+     * @param string $key deg|code|name
      *
      * @return string|array default is code
      */
-    public function getWindDirection($key = "code")
+    public function getWindDirection($key = 'code')
     {
         return isset($this->wind_direction[$key]) ? $this->wind_direction[$key] : null;
     }
@@ -204,11 +204,11 @@ class Forecast
      *     mps [default]
      *     name.
      *
-     * @param String $key mps|name
+     * @param string $key mps|name
      *
      * @return string|array default value is meters pr sec
      */
-    public function getWindSpeed($key = "mps")
+    public function getWindSpeed($key = 'mps')
     {
         return isset($this->wind_speed[$key]) ? $this->wind_speed[$key] : null;
     }
@@ -235,7 +235,7 @@ class Forecast
      */
     public function getWindIconKey()
     {
-        $speed = (round(($this->getWindSpeed("mps")/2.5)) * 2.5) * 10;
+        $speed = (round(($this->getWindSpeed('mps') / 2.5)) * 2.5) * 10;
         $speed = str_pad($speed, 4, '0', STR_PAD_LEFT);
 
         // 2 and down is 0 speed - vindstille
@@ -243,7 +243,7 @@ class Forecast
             return 0;
         }
 
-        $degree = round((($this->getWindDirection("deg")/10) * 2) / 2) * 10;
+        $degree = round((($this->getWindDirection('deg') / 10) * 2) / 2) * 10;
         $degree = str_pad($degree, 3, '0', STR_PAD_LEFT);
 
         // 360 degree is 0
@@ -259,11 +259,11 @@ class Forecast
      *     unit
      *     value [default].
      *
-     * @param String $key value|unit
+     * @param string $key value|unit
      *
      * @return string|array see documentation
      */
-    public function getTemperature($key = "value")
+    public function getTemperature($key = 'value')
     {
         return isset($this->temperature[$key]) ? $this->temperature[$key] : null;
     }
@@ -281,11 +281,11 @@ class Forecast
      *     unit
      *     value [default].
      *
-     * @param String $key value|unit
+     * @param string $key value|unit
      *
      * @return string|array see documentation
      */
-    public function getPressure($key = "value")
+    public function getPressure($key = 'value')
     {
         return isset($this->pressure[$key]) ? $this->pressure[$key] : null;
     }
@@ -357,14 +357,14 @@ class Forecast
      */
     public function toArray()
     {
-        return array(
-            'from' => $this->getFrom(),
-            'to'   => $this->getTo(),
-            'symbol' => $this->symbol,
-            'temperature' => $this->temperature,
-            'wind_speed' => $this->wind_speed,
+        return [
+            'from'           => $this->getFrom(),
+            'to'             => $this->getTo(),
+            'symbol'         => $this->symbol,
+            'temperature'    => $this->temperature,
+            'wind_speed'     => $this->wind_speed,
             'wind_direction' => $this->wind_direction,
-            'period' => $this->period,
-        );
+            'period'         => $this->period,
+        ];
     }
 }
