@@ -53,7 +53,7 @@ class Yr
     }
 
     /**
-     * This method builds the Yr object from the freely available Yr api.
+     * This method downloads and builds the Yr object from the freely available Yr api.
      *
      * Notice that you have to be very specific about the location.
      * Use the same location as you will find on the yr.no site. For instance:
@@ -65,7 +65,7 @@ class Yr
      *
      * @param String $location   the location, like Norway/Vestfold/Sandefjord
      * @param String $cache_path where to store the cache
-     * @param int    $cache_life life of the cache
+     * @param int    $cache_life life of the cache in minutes
      * @param String $language   language, norwegian or english
      *
      * @return Location
@@ -97,7 +97,7 @@ class Yr
         $cache_path = realpath($cache_path).DIRECTORY_SEPARATOR;
 
         // Convert cache life to seconds
-        $cache_life * 60;
+        $cache_life_sec = $cache_life * 60;
 
         // Check if cache path is readable
         if (!is_writable($cache_path)) {
@@ -130,21 +130,45 @@ class Yr
         }
 
         // Download the periodic xml if we don't have it
-        self::downloadData(
+        $xml_periodic = self::downloadData(
             "$baseurl/$location/forecast.xml",
             $xml_periodic_path,
-            $cache_life
+            $cache_life_sec
         );
 
         // Download the hourly xml if we don't have it
-        self::downloadData(
+        $xml_hourly = self::downloadData(
             "$baseurl/$location/forecast_hour_by_hour.xml",
             $xml_hourly_path,
-            $cache_life
+            $cache_life_sec
         );
+        
+        return self::createFromXML($xml_periodic, $xml_hourly);
+    }
+    
+    /**
+	 * Build the Yr object
+	 *
+	 * @param String $periodic XML file content
+	 * @param String $hourly XML file content
+	 *
+	 * @return Location
+	 *
+	 * @throws \InvalidArgumentException
+	 * @throws \RuntimeException
+	 */
+	 public static function createFromXML($periodic, $hourly)
+	{
+	    if (!isset($periodic) || empty($periodic)) {
+			throw new \InvalidArgumentException("Periodic XML document need to be set");
+		}
 
-        $xml_hourly = new \SimpleXMLElement($xml_hourly_path, null, true);
-        $xml_periodic = new \SimpleXMLElement($xml_periodic_path, null, true);
+		if (!isset($hourly) || empty($hourly)) {
+			throw new \InvalidArgumentException("Hourly XML document need to be set");
+		}
+
+        $xml_hourly = new \SimpleXMLElement($hourly);
+        $xml_periodic = new \SimpleXMLElement($periodic);
 
         // Forecasts
         $forecasts_hourly   = self::getForecastsFromXml($xml_hourly);
@@ -197,7 +221,7 @@ class Yr
             return $yr;
         } catch (\Exception $e) {
             // We fall back and send exception if something goes wrong
-            throw new \RuntimeException("Could not create Location object");
+            throw new \RuntimeException("Could not create Location object. Message: " . $e->getMessage());
         }
     }
 
@@ -301,17 +325,20 @@ class Yr
      * @param String  $url
      * @param String  $path
      * @param integer $cacheLife
+     * @return String XML content
      */
     private static function downloadData($url, $path, $cacheLife)
     {
         if (!is_readable($path) || ((time() - filemtime($path)) > $cacheLife)) {
-            $xml_content = fopen($url, 'r');
+            $xml_content = file_get_contents($url);
 
             if (!empty($xml_content)) {
                 // Only cache if there is content from request
                 file_put_contents($path, $xml_content);
+                return $xml_content;
             }
         }
+        return file_get_contents($path);
     }
 
     /**
@@ -323,11 +350,23 @@ class Yr
     {
         switch ($language) {
             case "norwegian":
-            case "newnorwegian":
-            case "neonorwegian":
-            case "nynorsk":
+            case "norsk":
+            case "bokmål":
                 return self::API_URL."sted/";
-
+                break;
+            case "newnorwegian":
+            case "nynorsk":
+                return self::API_URL."stad/";
+                break;
+            case "sami":
+            case "northernsami":
+            case "davvisámegiella":
+                return self::API_URL."sadji/";
+                break;
+            case "kven":
+            case "kväani":
+                return self::API_URL."paikka/";
+                break;
             default:
                 return self::API_URL."place/";
         }
